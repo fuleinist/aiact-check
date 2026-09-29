@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import fnmatch
 import json
 import os
 import re
@@ -211,9 +212,10 @@ def _normalize_pkg(pkg: str) -> str:
 # Main scan
 # ---------------------------------------------------------------------------
 
-def scan_project(root: str | Path) -> ScanResult:
+def scan_project(root: str | Path, exclude: list[str] | None = None) -> ScanResult:
     root = Path(root).resolve()
     result = ScanResult(project_path=str(root), files_scanned=0)
+    exclude = exclude or []
     if not root.is_dir():
         result.errors.append(f"not a directory: {root}")
         return result
@@ -232,8 +234,10 @@ def scan_project(root: str | Path) -> ScanResult:
         text = _read_text(path)
         if text is None:
             continue
-        result.files_scanned += 1
         rel = _rel(path, root)
+        if exclude and any(fnmatch.fnmatch(rel, pat) for pat in exclude):
+            continue
+        result.files_scanned += 1
 
         if is_manifest:
             for pkg in parse_manifest(path, text):

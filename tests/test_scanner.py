@@ -140,3 +140,17 @@ def test_scan_result_serialization(chatbot_project):
     result = scan_project(chatbot_project)
     d = result.detections[0].to_dict()
     assert set(d.keys()) == {"kind", "name", "capability", "note", "locations"}
+
+
+def test_scan_exclude_patterns(chatbot_project):
+    result = scan_project(chatbot_project, exclude=["app.py", "requirements.txt"])
+    assert result.detections == []
+    assert result.files_scanned == 0
+
+
+def test_scan_exclude_partial(chatbot_project):
+    result = scan_project(chatbot_project, exclude=["app.py"])
+    deps = {d.name.lower() for d in result.detections if d.kind == "dependency"}
+    ids = {d.name for d in result.detections if d.kind == "code-signal"}
+    assert "openai" in deps          # manifest still scanned
+    assert "llm-api-openai" not in ids  # source excluded

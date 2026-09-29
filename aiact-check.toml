@@ -1,0 +1,12 @@
+# aiact-check's own config — used when scanning this repository itself.
+# The rule tables in aiact_check/knowledge.py contain prohibited-practice
+# pattern strings, so the scanner would otherwise flag its own source
+# (dogfooding false positive). Exclude the tables from scanning.
+
+[project]
+role = "provider"
+market = "none"   # developer tool, no AI system placed on market by the repo itself
+users = "business"
+
+[scan]
+exclude = ["aiact_check/*", "tests/*", "SPEC.md", "README.md"]

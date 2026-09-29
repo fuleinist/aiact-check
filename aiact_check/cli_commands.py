@@ -27,7 +27,7 @@ def _emit(text: str, output: str | None, quiet: bool) -> None:
 
 def run_scan(args: argparse.Namespace) -> int:
     cfg = load_config(args.config, args.path)
-    scan = scan_project(args.path)
+    scan = scan_project(args.path, exclude=cfg.exclude)
     cls = classify(scan, cfg)
     obligations = build_obligations(cls, cfg)
     deadlines = deadline_awareness()
