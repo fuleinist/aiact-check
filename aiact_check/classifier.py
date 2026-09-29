@@ -28,6 +28,9 @@ PROHIBITED_SIGNALS = {
     "social-scoring", "subliminal-manipulation", "scraped-facial-db", "rbi-public-space",
 }
 
+# Code signals that indicate a conversational LLM interface (Art. 50(1) candidate)
+CHATBOT_SIGNALS = {"prompt-construction", "llm-api-openai", "llm-api-anthropic", "llm-api-generic"}
+
 
 @dataclass
 class Classification:
@@ -157,6 +160,20 @@ def classify(scan: ScanResult, cfg: ProjectConfig) -> Classification:
             id="transparency:deepfake-declared", severity=RISK_TRANSPARENCY,
             title="Declared deepfake generation", article="Art. 50(4)",
             why="aiact-check.toml declares deepfake generation. Deepfakes must be disclosed as artificially generated or manipulated.",
+        ))
+
+    conversational = [d for d in scan.detections if d.name in CHATBOT_SIGNALS]
+    if conversational:
+        names = ", ".join(sorted(d.name for d in conversational))
+        transparency_reasons.append(f"conversational LLM code signals: {names} (Art. 50(1)/(2) candidate)")
+        result.findings.append(Finding(
+            id="transparency:conversational-llm", severity=RISK_TRANSPARENCY,
+            title="Conversational LLM usage detected", article="Art. 50(1)/(2)",
+            why=("Code builds LLM prompts / calls chat-completion APIs. If the system interacts directly "
+                 "with users (chatbot, assistant), they must be informed they are interacting with AI "
+                 "(Art. 50(1)), and any synthetic text/audio output shown to the public must be marked "
+                 "machine-readably (Art. 50(2)). Review locations to confirm the interaction pattern."),
+            locations=[loc for d in conversational for loc in d.locations[:3]],
         ))
 
     generative_caps = scan.capabilities() & GENERATIVE_CAPABILITIES

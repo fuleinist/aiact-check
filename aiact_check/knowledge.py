@@ -23,7 +23,7 @@ AI_LIBRARY_REGISTRY: dict[str, list[str]] = {
         "langchain-anthropic", "langchain-google-genai", "ollama", "ollama-python",
     ],
     "local-model-runtime": [
-        "llama-cpp-python", "llama.cpp", "ctransformers", "ctranslate2", "onnxruntime",
+        "transformers", "llama-cpp-python", "llama.cpp", "ctransformers", "ctranslate2", "onnxruntime",
         "onnxruntime-gpu", "mlx", "mlx-lm", "gpt4all", "localai", "koboldcpp",
         "vllm", "text-generation-inference", "whisper.cpp", "whisper-rs",
     ],
@@ -91,8 +91,8 @@ class CodeSignal:
 
 
 CODE_SIGNALS: list[CodeSignal] = [
-    CodeSignal("llm-api-openai", r"openai\.(ChatCompletion|Client|chat\.completions|OpenAI)|api\.openai\.com", "llm-provider-sdk", "OpenAI API usage"),
-    CodeSignal("llm-api-anthropic", r"anthropic\.(Client|Anthropic|messages\.create)|api\.anthropic\.com", "llm-provider-sdk", "Anthropic API usage"),
+    CodeSignal("llm-api-openai", r"openai\.(ChatCompletion|Client|chat\.completions|OpenAI)|api\.openai\.com|from openai import|import openai\b|OpenAI\s*\(", "llm-provider-sdk", "OpenAI API usage"),
+    CodeSignal("llm-api-anthropic", r"anthropic\.(Client|Anthropic|messages\.create)|api\.anthropic\.com|from anthropic import|import anthropic\b|Anthropic\s*\(", "llm-provider-sdk", "Anthropic API usage"),
     CodeSignal("llm-api-generic", r"completions?\.create\s*\(|chat\.completions|generate_text\s*\(|/v1/chat/completions", "llm-provider-sdk", "Generic LLM completion call"),
     CodeSignal("ollama-local", r"localhost:11434|ollama\.(chat|generate|Client)|127\.0\.0\.1:11434", "local-model-runtime", "Ollama local model endpoint"),
     CodeSignal("hf-transformers", r"from transformers import|AutoModelForCausalLM|AutoTokenizer|pipeline\(\s*[\"'](text-generation|automatic-speech-recognition)", "local-model-runtime", "HuggingFace transformers usage"),
@@ -110,12 +110,12 @@ CODE_SIGNALS: list[CodeSignal] = [
     CodeSignal("scraped-facial-db", r"(scrape.{0,30}facial|facial.{0,30}scrap|untargeted.{0,30}facial|clearview)", "prohibited-candidate", "Untargeted facial-image scraping signal (Art. 5(1)(e))"),
     CodeSignal("rbi-public-space", r"(real[_ -]?time.{0,30}biometric|remote[_ -]?biometric[_ -]?identification|rbi.{0,20}public|cctv.{0,30}face)", "prohibited-candidate", "Real-time remote biometric ID in public spaces signal (Art. 5(1)(h))"),
     CodeSignal("hr-screening", r"(resume[_ -]?(screen|pars|rank)|cv[_ -]?(screen|rank|filter)|candidate[_ -]?(rank|score|screen)|applicant[_ -]?(track|score|filter)|hire.{0,20}(score|model|ai)|recruitment.{0,20}(score|model|ai|llm))", "high-risk-candidate", "Employment/HR screening signal (Annex III(4))"),
-    CodeSignal("credit-scoring", r"(credit[_ -]?(scor|risk|worthiness)|loan[_ -]?(approv|scor|eligib)|solvency", "high-risk-candidate", "Credit scoring signal (Annex III(5)(b))"),
+    CodeSignal("credit-scoring", r"(credit[_ -]?(scor|risk|worthiness)|loan[_ -]?(approv|scor|eligib)|solvency)", "high-risk-candidate", "Credit scoring signal (Annex III(5)(b))"),
     CodeSignal("education-assessment", r"(student[_ -]?(assess|score|evaluat|monitor)|exam[_ -]?(scor|proctor|evaluat)|proctoring|admission.{0,20}(score|model|ai))", "high-risk-candidate", "Education assessment signal (Annex III(3))"),
     CodeSignal("essential-services", r"(insurance[_ -]?(pricing|risk|scor)|health[_ -]?insurance.{0,20}(eligib|scor)|benefit[_ -]?(eligib|allocat)|public[_ -]?assistance.{0,20}(eligib|scor)|triage[_ -]?(model|ai|score)|dispatch[_ -]?(emergenc|ambulance|police).{0,20}(ai|model|priorit))", "high-risk-candidate", "Essential services eligibility signal (Annex III(5))"),
     CodeSignal("critical-infrastructure", r"(safety[_ -]?component.{0,30}(infrastructure|traffic|water|gas|electric|nuclear)|critical[_ -]?infrastructure.{0,30}(ai|model|predict))", "high-risk-candidate", "Critical infrastructure signal (Annex III(2))"),
-    CodeSignal("law-enforcement", r"(crime[_ -]?(risk|predict)|predictive[_ -]?policing|offender[_ -]?(risk|recidiv)|evidence[_ -]?reliability", "high-risk-candidate", "Law enforcement signal (Annex III(6))"),
-    CodeSignal("migration-border", r"(asylum[_ -]?(applicat|risk|screen)|visa[_ -]?(risk|screen|approv)|border[_ -]?(surveillance|risk)|migration[_ -]?risk", "high-risk-candidate", "Migration/border signal (Annex III(7))"),
+    CodeSignal("law-enforcement", r"(crime[_ -]?(risk|predict)|predictive[_ -]?policing|offender[_ -]?(risk|recidiv)|evidence[_ -]?reliability)", "high-risk-candidate", "Law enforcement signal (Annex III(6))"),
+    CodeSignal("migration-border", r"(asylum[_ -]?(applicat|risk|screen)|visa[_ -]?(risk|screen|approv)|border[_ -]?(surveillance|risk)|migration[_ -]?risk)", "high-risk-candidate", "Migration/border signal (Annex III(7))"),
     CodeSignal("judicial-democratic", r"(judicial.{0,20}(ai|model|decision)|court.{0,20}(outcome|decision).{0,20}(predict|model)|election.{0,20}(influence|outcome).{0,20}(model|ai))", "high-risk-candidate", "Judicial/democratic process signal (Annex III(8))"),
 ]
 

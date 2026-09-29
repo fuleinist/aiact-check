@@ -34,7 +34,17 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _force_utf8_stdio() -> None:
+    """Windows consoles may default to cp1252; make emoji/unicode output safe."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[union-attr]
+        except (AttributeError, OSError):
+            pass
+
+
 def main(argv: list[str] | None = None) -> int:
+    _force_utf8_stdio()
     parser = build_parser()
     args = parser.parse_args(argv)
 
